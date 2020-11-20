@@ -1,31 +1,42 @@
 package blackBoxInteger;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
+        Scanner scanner = new Scanner(System.in);
 
-        Class<?> blackBox = BlackBoxInt.class;
+        Class<?> clazz = BlackBoxInt.class;
 
-        Method[] methods = blackBox.getDeclaredMethods();
+        Constructor<?> constructor = clazz.getDeclaredConstructor(int.class);
 
-        Constructor<?> blackBoxInt = blackBox.getDeclaredConstructor(int.class);
+        constructor.setAccessible(true);
+        BlackBoxInt blackBoxInt = (BlackBoxInt) constructor.newInstance(0);
 
-        blackBoxInt.setAccessible(true);
-        blackBoxInt.newInstance(15);
-        System.out.println(blackBoxInt);
+        String input = scanner.nextLine();
 
-        blackBox.getDeclaredField("innerValue").setAccessible(true);
+        while (!"END".equals(input)) {
 
-        BlackBoxInt.class.getDeclaredConstructor().setAccessible(true);
-        Constructor constructor = BlackBoxInt.class.getDeclaredConstructor(int.class);
+            String[] tokens = input.split("_");
 
-        
-        BlackBoxInt blackBoxInt1 = (BlackBoxInt) constructor.newInstance(15);
+            String command = tokens[0];
+            int value = Integer.parseInt(tokens[1]);
 
-        System.out.println();
+
+            Method method = clazz.getDeclaredMethod(command, int.class);
+            method.setAccessible(true);
+            method.invoke(blackBoxInt, value);
+
+            Field field = clazz.getDeclaredField("innerValue");
+            field.setAccessible(true);
+            System.out.println(field.get(blackBoxInt));
+
+            input = scanner.nextLine();
+        }
 
     }
 }
